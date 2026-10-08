@@ -1,0 +1,17 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><script src="https://cdn.tailwindcss.com"></script><title>Frequently Asked Questions</title></head>
+<body class="min-h-screen bg-sky-50 p-6 font-sans">
+<main class="max-w-xl mx-auto"><h1 class="text-xl font-bold text-center text-indigo-900 my-6">Frequently Asked Questions</h1>
+<div id="faq" class="space-y-3"></div></main>
+<script>
+const q=[["How do I reset my college portal password?","Use the Forgot Password link on the login page and follow the email instructions."],
+["Where can I download my exam hall ticket?","Log in to the student portal and open the Examination section."],
+["How can I contact my department office?","Visit the department office in the main building or email the department coordinator."],
+["When are practical journals due?","Submit journals to your lab faculty by the date announced in the lab schedule."]];
+faq.innerHTML=q.map((x,i)=>`<div class="bg-white rounded-lg shadow-md overflow-hidden">
+<button class="faq-q w-full flex justify-between items-center px-4 py-3 text-left text-sm font-semibold text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-expanded="false" aria-controls="a${i}">
+<span>${x[0]}</span><span class="icon text-lg">+</span></button>
+<div id="a${i}" class="faq-a hidden px-4 pb-3 text-xs text-slate-600">${x[1]}</div></div>`).join("");
+document.querySelectorAll(".faq-q").forEach(b=>b.addEventListener("click",()=>{
+ const a=b.nextElementSibling,open=a.classList.toggle("hidden")===false;
+ b.setAttribute("aria-expanded",open);b.querySelector(".icon").textContent=open?"–":"+";}));
+</script></body></html>

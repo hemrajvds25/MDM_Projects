@@ -1,0 +1,31 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><script src="https://cdn.tailwindcss.com"></script><title>Student Expense Tracker</title></head>
+<body class="min-h-screen bg-slate-100 font-sans">
+<header class="bg-emerald-600 text-white text-center py-4"><h1 class="text-xl font-bold">Student Expense Tracker</h1><p class="text-xs text-emerald-100">Track where your money goes</p></header>
+<main class="max-w-4xl mx-auto p-4 sm:p-8 flex flex-col md:flex-row gap-6">
+<section class="md:w-1/3 bg-white rounded-xl shadow p-4 space-y-3 h-fit">
+<h2 class="text-sm font-semibold">Add Expense</h2>
+<input id="title" placeholder="Title" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+<input id="amount" type="number" min="1" placeholder="Amount" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+<select id="cat" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400"><option>Food</option><option>Travel</option><option>Books</option><option>Other</option></select>
+<button id="add" class="w-full py-2 rounded-md bg-emerald-500 text-white text-sm hover:bg-emerald-600 active:scale-95 transition focus:outline-none focus:ring-2 focus:ring-emerald-300">Add Expense</button>
+<p id="msg" class="text-xs text-red-600"></p></section>
+<section class="md:flex-1 space-y-3">
+<div class="bg-white rounded-xl shadow p-4 flex items-center justify-between"><div><p class="text-xs text-slate-500">Total Spent</p><p id="total" class="text-2xl font-bold text-emerald-600">₹0</p></div>
+<select id="filter" aria-label="Filter by category" class="border border-slate-300 rounded-md px-2 py-1 text-sm bg-white"><option>All</option><option>Food</option><option>Travel</option><option>Books</option><option>Other</option></select></div>
+<ul id="list" class="space-y-2"></ul></section></main>
+<script>
+const $=id=>document.getElementById(id);
+const badge={Food:"bg-orange-100 text-orange-600",Travel:"bg-sky-100 text-sky-600",Books:"bg-purple-100 text-purple-600",Other:"bg-slate-200 text-slate-600"};
+let ex=[];try{ex=JSON.parse(localStorage.getItem("expenses"))||[]}catch(e){}
+const save=()=>{try{localStorage.setItem("expenses",JSON.stringify(ex))}catch(e){}};
+function render(){const s=ex.filter(x=>$("filter").value==="All"||x.category===$("filter").value);
+ $("total").textContent="₹"+s.reduce((a,b)=>a+b.amount,0);
+ $("list").innerHTML=s.length?s.map(x=>`<li class="bg-white rounded-lg shadow-sm px-4 py-3 flex items-center justify-between"><div><p class="text-sm font-medium"></p><span class="text-[10px] rounded-full px-2 ${badge[x.category]}">${x.category}</span></div>
+<div class="flex items-center gap-3"><span class="text-sm font-semibold">₹${x.amount}</span><button data-id="${x.id}" aria-label="Delete expense" class="del text-red-500 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-300 rounded">✕</button></div></li>`).join(""):'<li class="text-center text-sm text-slate-500 py-6">No expenses yet. Add your first one.</li>';
+ $("list").querySelectorAll("li p").forEach((p,i)=>p.textContent=s[i].title);}
+$("add").addEventListener("click",()=>{const t=$("title").value.trim(),a=parseFloat($("amount").value);
+ if(!t||isNaN(a)||a<=0){$("msg").textContent="Enter a title and an amount greater than 0.";return}
+ $("msg").textContent="";ex.push({id:Date.now(),title:t,amount:a,category:$("cat").value});save();$("title").value=$("amount").value="";render()});
+$("list").addEventListener("click",e=>{const b=e.target.closest(".del");if(b){ex=ex.filter(x=>x.id!=b.dataset.id);save();render()}});
+$("filter").addEventListener("change",render);render();
+</script></body></html>
