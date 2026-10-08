@@ -1,0 +1,36 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><script src="https://cdn.tailwindcss.com"></script><title>My To-Do List</title></head>
+<body class="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 flex items-center justify-center p-4 font-sans">
+<main class="w-full max-w-md bg-white rounded-2xl shadow-xl p-5">
+<h1 class="text-2xl font-bold text-center text-indigo-600">My To-Do List</h1>
+<p id="count" class="text-xs text-center text-slate-500 mb-4">0 of 0 tasks completed</p>
+<div class="flex gap-2">
+<input id="task" type="text" placeholder="Add a new task" aria-label="New task" class="flex-1 border-2 border-indigo-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+<button id="add" class="px-5 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 active:scale-95 transition focus:outline-none focus:ring-2 focus:ring-indigo-300">Add</button></div>
+<p id="msg" class="text-xs text-red-600 mt-1 min-h-4"></p>
+<ul id="list" class="mt-2 space-y-2"></ul></main>
+<script>
+const $=id=>document.getElementById(id);
+let tasks=[];try{tasks=JSON.parse(localStorage.getItem("todos"))||[]}catch(e){}
+if(!tasks.length)tasks=[{id:1,text:"Complete DSA assignment",done:true},{id:2,text:"Practice JavaScript for 1 hour",done:false},{id:3,text:"Prepare for Physics test",done:true},{id:4,text:"Submit practical journal",done:false}];
+const save=()=>{try{localStorage.setItem("todos",JSON.stringify(tasks))}catch(e){}};
+function row(t){
+ const li=document.createElement("li");li.dataset.id=t.id;
+ li.className="flex items-center gap-3 border border-slate-200 bg-slate-50 rounded-lg px-3 py-2";
+ const cb=document.createElement("input");cb.type="checkbox";cb.checked=t.done;cb.setAttribute("aria-label","Mark complete");cb.className="chk h-4 w-4 accent-indigo-600";
+ const sp=document.createElement("span");sp.textContent=t.text;sp.className="flex-1 text-sm "+(t.done?"line-through text-gray-400":"text-slate-800");
+ const del=document.createElement("button");del.textContent="✕";del.setAttribute("aria-label","Delete task");del.className="del text-red-500 hover:text-red-700 rounded focus:outline-none focus:ring-2 focus:ring-red-300";
+ li.append(cb,sp,del);return li}
+function render(){
+ $("list").replaceChildren(...tasks.map(row));
+ if(!tasks.length){const e=document.createElement("li");e.className="text-center text-sm text-slate-500 py-4";e.textContent="No tasks yet. Add your first one above.";$("list").append(e)}
+ $("count").textContent=tasks.filter(t=>t.done).length+" of "+tasks.length+" tasks completed"}
+function add(){const v=$("task").value.trim();
+ if(!v){$("msg").textContent="Enter a task before adding.";return}
+ $("msg").textContent="";tasks.push({id:Date.now(),text:v,done:false});save();$("task").value="";render()}
+$("add").addEventListener("click",add);
+$("task").addEventListener("keydown",e=>{if(e.key==="Enter")add()});
+$("list").addEventListener("click",e=>{const li=e.target.closest("li[data-id]");if(!li)return;const id=+li.dataset.id;
+ if(e.target.closest(".del")){tasks=tasks.filter(t=>t.id!==id);save();render()}
+ else if(e.target.closest(".chk")){const t=tasks.find(t=>t.id===id);t.done=!t.done;save();render()}});
+render();
+</script></body></html>
